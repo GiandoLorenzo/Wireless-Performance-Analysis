@@ -6,7 +6,7 @@ Authors: Michele Cetraro, Lorenzo Giandomenico, Christian Lombardozzi, and Aless
 
 ## Files
 
-- [Wifi_lab.pdf](Wifi_lab.pdf): compiled project report.
+- [wireless_performance.pdf](wireless_performance.pdf): compiled project report.
 - [script.py](script.py): automated iperf3 measurements and statistical summaries.
 
 ## Requirements
