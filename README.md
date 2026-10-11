@@ -1,33 +1,33 @@
 # Wireless Performance Analysis
 
-Progetto di laboratorio per valutare il goodput TCP e UDP nelle topologie Ethernet-Ethernet, Ethernet-WiFi e WiFi-WiFi, con standard IEEE 802.11b e 802.11g.
+Laboratory project evaluating TCP and UDP goodput across Ethernet-to-Ethernet, Ethernet-to-WiFi, and WiFi-to-WiFi topologies using the IEEE 802.11b and 802.11g standards.
 
-Autori: Michele Cetraro, Lorenzo Giandomenico, Christian Lombardozzi e Alessandro Minutoli.
+Authors: Michele Cetraro, Lorenzo Giandomenico, Christian Lombardozzi, and Alessandro Minutoli.
 
-## File
+## Files
 
-- [Wifi_lab.pdf](Wifi_lab.pdf): relazione compilata del progetto.
-- [script.py](script.py): automazione delle misure con iperf3 e riepilogo statistico.
+- [Wifi_lab.pdf](Wifi_lab.pdf): compiled project report.
+- [script.py](script.py): automated iperf3 measurements and statistical summaries.
 
-## Requisiti
+## Requirements
 
-Python 3.9 o successivo e iperf3 su entrambi gli host. Lo script usa solo la libreria standard Python. Per la variazione della MTU TCP servono Linux, iproute2 e privilegi root.
+Python 3.9 or later on the client and iperf3 on both hosts. The script uses only the Python standard library. TCP interface MTU sweeps require Linux, iproute2, and root privileges.
 
-Su Ubuntu:
+On Ubuntu:
 
 ```bash
 sudo apt install iperf3 iproute2
 ```
 
-## Utilizzo
+## Usage
 
-Avviare sul server:
+Start iperf3 on the server:
 
 ```bash
 iperf3 -s
 ```
 
-Sul client, sostituire l'indirizzo IP e il nome dell'interfaccia con quelli del proprio testbed.
+Run the following commands on the client, replacing the IP address and interface name with those of your testbed.
 
 ### UDP
 
@@ -38,7 +38,7 @@ python3 script.py --server 192.168.1.2 --protocol udp \
   --duration 10 --repetitions 10
 ```
 
-`--sizes` indica il payload UDP in byte. `--bitrate` specifica il carico offerto: 100M è un esempio di saturazione, da adattare all'esperimento. Con IPv4 senza opzioni e MTU di percorso 1500, il limite senza frammentazione è 1472 byte; il caso 1500 permette di studiarne gli effetti, se il percorso consente la frammentazione.
+`--sizes` specifies the UDP payload in bytes. `--bitrate` sets the offered load: 100M is an example intended to saturate the link and should be adjusted for each experiment. With IPv4 without options and a path MTU of 1500 bytes, the maximum payload without fragmentation is 1472 bytes. The 1500-byte case can be used to study fragmentation effects if the path permits fragmentation.
 
 ### TCP
 
@@ -49,26 +49,26 @@ sudo python3 script.py --server 192.168.1.2 --protocol tcp \
   --duration 10 --repetitions 10
 ```
 
-Per TCP, `--sizes` indica la MTU dell'interfaccia locale, non il payload applicativo. Lo script registra la MTU iniziale e tenta di ripristinarla al termine, anche su Ctrl+C. Un arresto forzato o uno spegnimento può impedire il ripristino.
+For TCP, `--sizes` specifies the local interface MTU, not the application payload. The script records the initial MTU and attempts to restore it on exit, including when interrupted with Ctrl+C. Forced termination or a system shutdown may prevent restoration.
 
-`--reverse` invia dal server al client; senza questa opzione il traffico va dal client al server. Standard WiFi, canale, velocità Ethernet, RTS/CTS e condizioni di interferenza vanno configurati separatamente sul testbed.
+`--reverse` sends traffic from the server to the client; without this option, traffic flows from the client to the server. Configure the WiFi standard, channel, Ethernet link speed, RTS/CTS, and interference conditions separately on the testbed.
 
-Anteprima dei comandi senza generare traffico o modificare la MTU:
+Preview the commands without generating traffic or changing the MTU:
 
 ```bash
 python3 script.py --server 192.168.1.2 --protocol tcp \
   --scenario preview --interface wlan0 --dry-run
 ```
 
-## Risultati
+## Results
 
-Ogni esecuzione crea una cartella distinta sotto `results/`, contenente:
+Each execution creates a separate directory under `results/`, containing:
 
-- `metadata.json`: parametri, versione iperf3 e MTU iniziale quando applicabile.
-- File `.stdout.json` e `.stderr.txt`: output originale di ogni processo concluso.
-- `measurements.csv`: goodput al ricevitore in Mbit/s, perdita e jitter se disponibili, stato ed eventuale errore.
-- `summary.csv`: media, minimo, massimo, deviazione standard campionaria e numero di prove riuscite o fallite per dimensione.
+- `metadata.json`: parameters, iperf3 version, and initial MTU when applicable.
+- `.stdout.json` and `.stderr.txt` files: raw output from each completed process.
+- `measurements.csv`: receiver goodput in Mbit/s, packet loss and jitter when available, status, and any error.
+- `summary.csv`: mean, minimum, maximum, sample standard deviation, and counts of successful and failed trials for each size.
 
-Le prove fallite sono escluse dalle statistiche e non vengono interpretate come goodput zero. Il valore della deviazione standard è vuoto quando sono disponibili meno di due misure riuscite.
+Failed trials are excluded from the statistics rather than treated as zero goodput. The standard deviation field is left empty when fewer than two successful measurements are available.
 
-Lo script incluso è una nuova implementazione di supporto al progetto, non lo script originale con cui sono state ottenute le misure della relazione; non è stato validato sul testbed originale.
+The included script is a new implementation supporting the project, not the original script used to obtain the measurements in the report. It has not been validated on the original testbed.
